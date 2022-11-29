@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "RSSFeed Page";
+}
+@model IEnumerable<RssFeed>
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+</head>
+<h2>Latest 3 Feeds:</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Publication Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Description</td>
+                <td>@item.PublicationDate</td>
+            </tr>           
+        }
+    </tbody>
+</table>
+<br />
+<ul>
+    <li id="title1"></li>
+    <li id="desc1"></li>
+    <li id="pd1"></li>
+    <br />
+    <li id="title2"></li>
+    <li id="desc2"></li>
+    <li id="pd2"></li>
+    <br />
+    <li id="title3"></li>
+    <li id="desc3"></li>
+    <li id="pd3"></li>
+</ul>
+<br /><br />
+<button onclick="GetMoreFeeds()">
+    Load More RssFeeds...
+</button>
