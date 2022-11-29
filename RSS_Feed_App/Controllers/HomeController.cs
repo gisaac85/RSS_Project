@@ -4,17 +4,35 @@ using System.Diagnostics;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using System.IO;
-using Microsoft.Extensions.Caching.Memory;
+using System.Runtime.Caching;
 using Newtonsoft.Json;
+using RSS_Feed_App.Helpers;
 
 namespace RSS_Feed_App.Controllers
 {
     public class HomeController : Controller
     {
         IEnumerable<SyndicationItem> post;
+
         public HomeController()
         {
 
+        }
+        public IActionResult RefreshList()
+        {
+            var cachedList = CacheHelper.FeedList().TakeLast(3).ToList();
+             var model = new List<RssFeed>();
+
+            foreach (var item in cachedList)
+            {
+                var rssFeed = new RssFeed();
+                rssFeed.Title = item.Title.Text;
+                rssFeed.Description = item.Summary.Text;
+                rssFeed.PublicationDate = item.PublishDate.ToString();
+
+                model.Add(rssFeed);       
+            };
+            return View(nameof(Index), model);
         }
 
         public IActionResult Index()
@@ -23,10 +41,6 @@ namespace RSS_Feed_App.Controllers
             var reader = XmlReader.Create(url);
             var feed = SyndicationFeed.Load(reader);
             post = feed.Items.TakeLast(3).OrderByDescending(x => x.PublishDate);
-
-            IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-            object result = cache.Set("Key", post);
-            bool found = cache.TryGetValue("Key", out result);
 
             var model = new List<RssFeed>();
 
@@ -37,9 +51,8 @@ namespace RSS_Feed_App.Controllers
                 rssFeed.Description = item.Summary.Text;
                 rssFeed.PublicationDate = item.PublishDate.ToString();
 
-                model.Add(rssFeed);
+                model.Add(rssFeed);       
             };
-
             return View(model);
         }
 
@@ -47,7 +60,7 @@ namespace RSS_Feed_App.Controllers
         {
             var url = "http://feeds.bbci.co.uk/news/world/rss.xml";
             var reader = XmlReader.Create(url);
-            var feed = SyndicationFeed.Load(reader);       
+            var feed = SyndicationFeed.Load(reader);
 
             post = feed.Items.SkipLast(3);
             var newPost = post.TakeLast(3).OrderByDescending(x => x.PublishDate);
@@ -63,7 +76,7 @@ namespace RSS_Feed_App.Controllers
 
                 model.Add(rssFeed);
             };
-        
+
             return Json(model);
         }
 

@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -20,6 +21,7 @@ app.UseCors(x => x
            .AllowAnyMethod()
            .AllowAnyHeader());
 
+app.UseResponseCaching();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
